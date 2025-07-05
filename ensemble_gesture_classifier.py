@@ -118,9 +118,21 @@ def train_models(k_folds: int = 5, seq_length: int = 128):
         X_tr_seq, X_va_seq = X_seq[tr_idx], X_seq[va_idx]
         y_tr, y_va = y[tr_idx], y[va_idx]
 
-        # LightGBM
-        lgb_clf = lgb.LGBMClassifier(n_estimators=500, random_state=42)
-        lgb_clf.fit(X_tr_feat, y_tr, eval_set=[(X_va_feat, y_va)], verbose=False)
+        # LightGBM with early stopping to avoid long training when there is no
+        # improvement.  The verbose level is also lowered to suppress repeated
+        # "No further splits" warnings from LightGBM.
+        lgb_clf = lgb.LGBMClassifier(
+            n_estimators=500,
+            random_state=42,
+            verbosity=-1,
+        )
+        lgb_clf.fit(
+            X_tr_feat,
+            y_tr,
+            eval_set=[(X_va_feat, y_va)],
+            early_stopping_rounds=50,
+            verbose=False,
+        )
 
         # RandomForest
         rf_clf = RandomForestClassifier(n_estimators=200, random_state=42)
