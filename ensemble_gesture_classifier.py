@@ -215,11 +215,12 @@ if __name__ == '__main__':
     if os.getenv('KAGGLE_IS_COMPETITION_RERUN'):
         inference_server.serve()
     else:
-        inference_server.run_local_gateway(
-            data_paths=(
-                '/kaggle/input/cmi-detect-behavior-with-sensor-data/test.csv',
-                '/kaggle/input/cmi-detect-behavior-with-sensor-data/test_demographics.csv',
-            )
-        )
+        test_csv = '/kaggle/input/cmi-detect-behavior-with-sensor-data/test.csv'
+        demo_csv = '/kaggle/input/cmi-detect-behavior-with-sensor-data/test_demographics.csv'
+        if os.path.exists(test_csv) and os.path.exists(demo_csv):
+            inference_server.run_local_gateway(data_paths=(test_csv, demo_csv))
+        else:
+            print('Local gateway skipped: test data not found.')
+
 
 
